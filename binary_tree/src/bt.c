@@ -2,22 +2,22 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-BTNode *bt_insert(BTNode *root, int value)
+BTNode *bt_insert(BTNode *root, int key)
 {
     if (root == NULL)
     {
         root = malloc(sizeof(BTNode));
-        root->value = value;
+        root->key = key;
         root->left = NULL;
         root->right = NULL;
     }
-    else if (value < root->value)
+    else if (key < root->key)
     {
-        root->left = bt_insert(root->left, value);
+        root->left = bt_insert(root->left, key);
     }
-    else if (value > root->value)
+    else if (key > root->key)
     {
-        root->right = bt_insert(root->right, value);
+        root->right = bt_insert(root->right, key);
     }
 
     return root;
@@ -55,19 +55,19 @@ BTNode *bt_find_max(BTNode *root)
     }
 }
 
-BTNode *bt_find(BTNode *root, int value)
+BTNode *bt_find(BTNode *root, int key)
 {
     if (root == NULL)
     {
         return NULL;
     }
-    else if (value < root->value)
+    else if (key < root->key)
     {
-        return bt_find(root->left, value);
+        return bt_find(root->left, key);
     }
-    else if (value > root->value)
+    else if (key > root->key)
     {
-        return bt_find(root->right, value);
+        return bt_find(root->right, key);
     }
     else
     {
@@ -96,7 +96,7 @@ int bt_height(BTNode *root)
     }
 }
 
-BTNode *bt_delete(BTNode *root, int value)
+BTNode *bt_delete(BTNode *root, int key)
 {
     BTNode *temp = NULL;
 
@@ -104,19 +104,19 @@ BTNode *bt_delete(BTNode *root, int value)
     {
         return NULL;
     }
-    else if (value < root->value)
+    else if (key < root->key)
     {
-        root->left = bt_delete(root->left, value);
+        root->left = bt_delete(root->left, key);
     }
-    else if (value > root->value)
+    else if (key > root->key)
     {
-        root->right = bt_delete(root->right, value);
+        root->right = bt_delete(root->right, key);
     }
     else if (root->left && root->right)
     {
         temp = bt_find_max(root->left);
-        root->value = temp->value;
-        root->left = bt_delete(root->left, root->value);
+        root->key = temp->key;
+        root->left = bt_delete(root->left, root->key);
     }
     else
     {
@@ -137,7 +137,7 @@ BTNode *bt_delete(BTNode *root, int value)
     return root;
 }
 
-// This means that we output values in increasing order.
+// This means that we output keys in increasing order.
 void bt_in_order_traversal(BTNode *root)
 {
     if (root == NULL)
@@ -150,7 +150,7 @@ void bt_in_order_traversal(BTNode *root)
         bt_in_order_traversal(root->left);
     }
 
-    printf("%i ", root->value);
+    printf("%i ", root->key);
 
     if (root->right)
     {
@@ -180,10 +180,10 @@ void bt_print(BTNode *root)
         bt_print(root->left);
     }
 
-    int left_value = root->left ? root->left->value : 0;
-    int right_value = root->right ? root->right->value : 0;
+    int left_key = root->left ? root->left->key : 0;
+    int right_key = root->right ? root->right->key : 0;
 
-    printf("NODE: KEY=%i CHILDREN: (%i, %i)\n", root->value, left_value, right_value);
+    printf("NODE: KEY=%i CHILDREN: (%i, %i)\n", root->key, left_key, right_key);
 
     if (root->right)
     {

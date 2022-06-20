@@ -34,12 +34,12 @@ int main()
     printf("\n");
 
     BTNode *min = bt_find_min(root);
-    assert(min->value == 2);
-    printf("MIN: %i\n", min->value);
+    assert(min->key == 2);
+    printf("MIN: %i\n", min->key);
 
     BTNode *max = bt_find_max(root);
-    assert(max->value == 35);
-    printf("MAX: %i\n", max->value);
+    assert(max->key == 35);
+    printf("MAX: %i\n", max->key);
 
     BTNode *ten_node = bt_find(root, 10);
     assert(ten_node);
