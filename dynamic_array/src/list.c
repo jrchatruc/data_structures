@@ -68,12 +68,13 @@ void list_destroy(List *list)
 
 void list_print(List *list)
 {
-    printf("[\n");
+    printf("[");
 
-    for (uint32_t i = 0; i < list->size; i++)
+    for (uint32_t i = 0; i < list->size - 1; i++)
     {
         printf("%i,", list->elements[i]);
     }
 
+    printf("%i", list->elements[list->size - 1]);
     printf("]\n");
 }

@@ -2,7 +2,7 @@
 #include <assert.h>
 #include "list.h"
 
-#define ITERATIONS 1e6
+#define ITERATIONS 1e2
 
 int main()
 {
@@ -19,6 +19,8 @@ int main()
         int result = list_get(&list, j);
         assert(result == j);
     }
+
+    list_print(&list);
 
     list_destroy(&list);
     assert(list.elements == NULL);

@@ -10,16 +10,6 @@
 static int hash(int key, uint32_t capacity);
 static void double_capacity(HashTable *ht);
 
-// TODO: What's a good sentinel value for occupied buckets?
-#define SENTINEL_VALUE       \
-    {                        \
-        .key = 0, .value = 0 \
-    }
-
-/*
-NOTE: This hash table implementation assumes that 0 (NULL) is not a valid value for a key.
-*/
-
 HashTable ht_create()
 {
     HashTable ht;
@@ -36,10 +26,13 @@ HashTable ht_create()
     return ht;
 }
 
-void ht_destroy(HashTable ht)
+void ht_destroy(HashTable *ht)
 {
-    assert(ht.key_values);
-    free(ht.key_values);
+    assert(ht->key_values);
+    free(ht->key_values);
+    ht->key_values = NULL;
+    ht->capacity = 0;
+    ht->size = 0;
 }
 
 void ht_set(HashTable *ht, int key, int value)
@@ -52,60 +45,57 @@ void ht_set(HashTable *ht, int key, int value)
     }
 
     int bucket_index = hash(key, ht->capacity);
-    KeyValue sentinel = SENTINEL_VALUE;
 
     // Increment the index until we hit an empty bucket or we hit the index where the previous value for `key` is.
-    while (!kv_is_equal(ht->key_values[bucket_index], sentinel) && (ht->key_values[bucket_index].key != key))
+    while (ht->key_values[bucket_index].occupied && (ht->key_values[bucket_index].key != key))
     {
         bucket_index = (bucket_index + 1) % ht->capacity;
     }
 
-    KeyValue kv_to_insert = {.key = key, .value = value};
+    KeyValue kv_to_insert = {.key = key, .value = value, .occupied = true};
     ht->key_values[bucket_index] = kv_to_insert;
     ht->size++;
 }
 
-int ht_get(HashTable *ht, int key)
+bool ht_get(HashTable *ht, int key, int *result)
 {
     assert(ht);
 
     int bucket_index = hash(key, ht->capacity);
-    KeyValue sentinel = SENTINEL_VALUE;
 
     while (true)
     {
         KeyValue current_kv = ht->key_values[bucket_index];
 
-        if (kv_is_equal(current_kv, sentinel))
+        if (!current_kv.occupied)
         {
-            return -1;
+            return false;
         }
 
         if (current_kv.key == key)
         {
-            return current_kv.value;
+            *result = current_kv.value;
+            return true;
         }
 
         bucket_index = (bucket_index + 1) % ht->capacity;
     }
 }
 
-bool kv_is_equal(KeyValue kv_1, KeyValue kv_2)
+bool kv_is_occupied(KeyValue kv)
 {
-    return (kv_1.key == kv_2.key) && (kv_1.value == kv_2.value);
+    return kv.occupied;
 }
 
 void ht_print(HashTable *ht)
 {
-    KeyValue sentinel = SENTINEL_VALUE;
-
     printf("{\n");
     printf("Size: %zu\n", ht->size);
     printf("Capacity: %zu\n", ht->capacity);
     for (uint32_t i = 0; i < ht->capacity; i++)
     {
         KeyValue current_kv = ht->key_values[i];
-        if (!kv_is_equal(current_kv, sentinel))
+        if (current_kv.occupied)
         {
             printf("(Key: %i, Value: %i, Key_hash: %i, Actual_index: %i)\n", current_kv.key, current_kv.value, hash(current_kv.key, ht->capacity), i);
         }
@@ -113,6 +103,7 @@ void ht_print(HashTable *ht)
     printf("}\n");
 }
 
+// TODO: Replace with a more interesting hash function
 static int hash(int key, uint32_t capacity)
 {
     return (key * (key + 3)) % capacity;
@@ -132,13 +123,12 @@ static void double_capacity(HashTable *ht)
     }
 
     HashTable new_ht = {.size = 0, .capacity = new_capacity, .key_values = new_key_values};
-    KeyValue sentinel = SENTINEL_VALUE;
 
     // Reassign the old buckets to their new positions now that the capacity is different.
     for (uint32_t i = 0; i < ht->capacity; i++)
     {
         KeyValue old_kv = ht->key_values[i];
-        if (!kv_is_equal(old_kv, sentinel))
+        if (old_kv.occupied)
         {
             ht_set(&new_ht, old_kv.key, old_kv.value);
         }
