@@ -3,10 +3,11 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "ht.h"
 
-static int hash(int key, size_t capacity);
+static int hash(int key, uint32_t capacity);
 static void double_capacity(HashTable *ht);
 
 // TODO: What's a good sentinel value for occupied buckets?
@@ -101,7 +102,7 @@ void ht_print(HashTable *ht)
     printf("{\n");
     printf("Size: %zu\n", ht->size);
     printf("Capacity: %zu\n", ht->capacity);
-    for (int i = 0; i < ht->capacity; i++)
+    for (uint32_t i = 0; i < ht->capacity; i++)
     {
         KeyValue current_kv = ht->key_values[i];
         if (!kv_is_equal(current_kv, sentinel))
@@ -112,7 +113,7 @@ void ht_print(HashTable *ht)
     printf("}\n");
 }
 
-static int hash(int key, size_t capacity)
+static int hash(int key, uint32_t capacity)
 {
     return (key * (key + 3)) % capacity;
 }
@@ -134,7 +135,7 @@ static void double_capacity(HashTable *ht)
     KeyValue sentinel = SENTINEL_VALUE;
 
     // Reassign the old buckets to their new positions now that the capacity is different.
-    for (int i = 0; i < ht->capacity; i++)
+    for (uint32_t i = 0; i < ht->capacity; i++)
     {
         KeyValue old_kv = ht->key_values[i];
         if (!kv_is_equal(old_kv, sentinel))
