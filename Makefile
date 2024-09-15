@@ -1,15 +1,18 @@
-.PHONY: clean
+.PHONY: clean fmt check_fmt
 
-TARGET=list
-TARGET_RELEASE=release
+TARGET=data_structures
 
 CC=cc
-CC_FLAGS=-std=c17 -Wall -Wextra -pedantic -O2
+CFLAGS=-std=c17 -Wall -Wextra -Wimplicit-fallthrough -Werror -pedantic -g -O0
+SANITIZER_FLAGS=-fsanitize=address -fno-omit-frame-pointer
+LN_FLAGS=
 
 BUILD_DIR=./build
 SRC_DIR=./src
 
 SOURCE = $(wildcard $(SRC_DIR)/*.c)
+
+HEADERS = $(wildcard $(SRC_DIR)/*.h)
 OBJECTS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SOURCE))
 
 # Gcc/Clang will create these .d files containing dependencies.
@@ -20,7 +23,7 @@ default: $(TARGET)
 $(TARGET): $(BUILD_DIR)/$(TARGET)
 
 $(BUILD_DIR)/$(TARGET): $(OBJECTS)
-	$(CC) $(CC_FLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(SANITIZER_FLAGS) $^ -o $@ $(LN_FLAGS)
 
 -include $(DEP)
 
@@ -30,10 +33,16 @@ $(BUILD_DIR)/$(TARGET): $(OBJECTS)
 # the same name as the .o file.
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(@D)
-	$(CC) $(CC_FLAGS) -MMD -c $< -o $@
+	$(CC) $(CFLAGS) $(SANITIZER_FLAGS) -MMD -c $< -o $@
 
 clean:
 	-rm -rf $(BUILD_DIR)
 
 run: $(TARGET)
 	$(BUILD_DIR)/$(TARGET)
+
+fmt:
+	clang-format --style=file -i $(SOURCE) $(HEADERS)
+
+check_fmt:
+	clang-format --style=file -Werror -n $(SOURCE) $(HEADERS)

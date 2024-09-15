@@ -4,9 +4,9 @@
 
 typedef struct List
 {
-    uint32_t size;
-    uint32_t capacity;
-    int *elements;
+	uint32_t size;
+	uint32_t capacity;
+	int *elements;
 } List;
 
 void list_init(List *list);

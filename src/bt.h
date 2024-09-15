@@ -2,9 +2,9 @@
 
 typedef struct BTNode
 {
-    int key;
-    struct BTNode *left;
-    struct BTNode *right;
+	int key;
+	struct BTNode *left;
+	struct BTNode *right;
 } BTNode;
 
 BTNode *bt_insert(BTNode *root, int key);

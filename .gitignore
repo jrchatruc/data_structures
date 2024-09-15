@@ -51,11 +51,8 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# build
-*/build
+# Compilation files
+build/
 
-# release
-*/rls
-
-# VSCode Stuff
-.vscode
+# clangd stuff
+.cache
